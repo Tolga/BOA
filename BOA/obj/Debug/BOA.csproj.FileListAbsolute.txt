@@ -1,0 +1,9 @@
+C:\Users\Tolga\Google Drive\BOA\App\BOA test\bin\Debug\BOA.exe.config
+C:\Users\Tolga\Google Drive\BOA\App\BOA test\bin\Debug\BOA.exe
+C:\Users\Tolga\Google Drive\BOA\App\BOA test\bin\Debug\BOA.pdb
+C:\Users\Tolga\Google Drive\BOA\App\BOA test\obj\Debug\BOA.csprojResolveAssemblyReference.cache
+C:\Users\Tolga\Google Drive\BOA\App\BOA test\obj\Debug\BOA.exe
+C:\Users\Tolga\Google Drive\BOA\App\BOA test\obj\Debug\BOA.pdb
+C:\Users\Tolga\Google Drive\BOA\App\BOA\bin\Debug\BOA.exe.config
+C:\Users\Tolga\Google Drive\BOA\App\BOA\obj\Debug\BOA.exe
+C:\Users\Tolga\Google Drive\BOA\App\BOA\obj\Debug\BOA.pdb
