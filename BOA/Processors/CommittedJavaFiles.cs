@@ -1,88 +1,68 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 // ReSharper disable InconsistentNaming
 namespace BOA.Processors
 {
-    public class CommittedJavaFiles : IProcessor
+    public class CommittedJavaFiles
     {
-        private List<string> Data { get; set; }
-        private Dictionary<string, int> Added { get; set; }
+        public Dictionary<string, User> Users { get; set; }
 
-        private Dictionary<string, DateTime> datesAdded { get; set; }
-
-        private Dictionary<string, int> Modified { get; set; }
-        private Dictionary<string, DateTime> datesModified { get; set; }
-        private Dictionary<string, int> Deleted { get; set; }
-        private Dictionary<string, DateTime> datesDeleted { get; set; }
-
-        public CommittedJavaFiles(List<string> data)
+        public CommittedJavaFiles(IEnumerable<string> data)
         {
-            Data = data;
-            //File.WriteAllLines("CommittedJavaFilesList.txt", data);
-        }
+            //File.WriteAllLines("CommittedJavaFiles.txt", data);
 
-        public void Process()
-        {
-            Added = new Dictionary<string, int>();
-            datesAdded = new Dictionary<string, DateTime>();
-            Modified = new Dictionary<string, int>();
-            datesModified = new Dictionary<string, DateTime>();
-            Deleted = new Dictionary<string, int>();
-            datesDeleted = new Dictionary<string, DateTime>();
-
-            foreach (var item in Data)
+            foreach (var item in data)
             {
-                var parted = item.Split(Convert.ToChar("="));
+                var split = item.Split(Convert.ToChar("="));
+                var commitId = int.Parse(split[1].Trim());
+                var projectId = int.Parse(split[0].Split(Convert.ToChar("[")).Last().Replace("]", "").Trim());
+                var change = split[4].Trim().ToLower();
+                var userName = split[2].Trim();
+                var date = DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(split[3].Trim().Replace("000000", "")));
 
-                var project = parted[0].Split(Convert.ToChar("[")).Last().Replace("]", "").Trim();
-                var changeType = parted[1].Trim();
-                var dateTime = DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(parted[2].Trim().Replace("000000", "")));
+                var user = new User();
 
-                switch (changeType)
+                if (Users.ContainsKey(userName))
                 {
-                    case "ADDED":
-                        if (Added.ContainsKey(project))
-                            Added[project]++;
-                        else
-                            Added[project] = 1;
-                        datesAdded[project] = dateTime.LocalDateTime;
-                        break;
-                    case "MODIFIED":
-                        if (Modified.ContainsKey(project))
-                            Modified[project]++;
-                        else
-                            Modified[project] = 1;
-                        datesModified[project] = dateTime.LocalDateTime;
-                        break;
-                    case "DELETED":
-                        if (Deleted.ContainsKey(project))
-                            Deleted[project]++;
-                        else
-                            Deleted[project] = 1;
-                        datesDeleted[project] = dateTime.LocalDateTime;
-                        break;
+                    user = Users.Single(u => u.Key.Equals(userName)).Value;
                 }
-                //var pid = Int32.Parse(Regex.Replace(parted[0], @"[^\d+]", ""));
+                else
+                {
+                    user.UserName = userName;
+                }
+
+                if (!user.Projects.Contains(projectId))
+                {
+                    user.Projects.Add(projectId);
+                }
+
+                var commit = new Commit();
+                var is_committed = user.Commits.Keys.Contains(commitId);
+
+                if (is_committed)
+                {
+                    commit = user.Commits.Single(c => c.Key.Equals(commitId)).Value;
+                }
+
+                switch (change)
+                {
+                    case "added": commit.Changes.Added++; break;
+                    case "modified": commit.Changes.Modified++; break;
+                    case "deleted": commit.Changes.Deleted++; break;
+                }
+
+                if (is_committed) continue;
+                commit.CommitId = commitId;
+                commit.ProjectId = projectId;
+                commit.Date = date;
+
+                user.Commits.Add(commitId, commit);
             }
             
             Console.Clear();
-            foreach (var added in Added)
-            {
-                Console.WriteLine();
-                Console.WriteLine("Project ID: {0}", added.Key);
-                Console.WriteLine("Added: {0}", added.Value);
-                Console.WriteLine("Modified: {0}", Modified.SingleOrDefault(s => s.Key == added.Key).Value);
-                Console.WriteLine("Deleted: {0}", Deleted.SingleOrDefault(s => s.Key == added.Key).Value);
-            }
             Console.ReadLine();
-
-            /*
-            File.WriteAllLines("ValidGitHubUsers.txt", users);
-            File.AppendAllText("ValidGitHubUsers.txt", "\r\nTotal: " + users.Count);
-            */
         }
     }
 }

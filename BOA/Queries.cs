@@ -1,7 +1,6 @@
-﻿// ReSharper disable InconsistentNaming
-namespace BOA
+﻿namespace BOA
 {
-    public class BOAQueries
+    public class Queries
     {
         public static string GetDevelopersList()
         {
@@ -36,18 +35,15 @@ namespace BOA
                     });";
         }
 
-        public static string GetCommitedJavaFilesList()
+        public static string GetCommitedJavaFiles()
         {
             return @"p: Project = input;
                     project: output collection[string] of string;
                     commit_date: time;
 
                     visit(p, visitor {
-                        before node: Revision -> commit_date = node.commit_date;
-                        before node: ChangedFile -> {
-                            if (iskind(""SOURCE_JAVA_JLS"", node.kind))
-                                project[p.id] << format(""%s = %s"", node.change, commit_date);
-                        }
+                        before node: Revision -> commit_info = format(""%s = %s = %s = %s"", node.id, node.committer.username, node.commit_date);
+                        before node: ChangedFile -> project[p.id] << format(""%s = %s"", commit_info, node.change);
                     });";
         }
     }

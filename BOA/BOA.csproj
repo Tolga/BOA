@@ -51,11 +51,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BOAQueries.cs" />
+    <Compile Include="Api.cs" />
+    <Compile Include="Changes.cs" />
+    <Compile Include="Commit.cs" />
+    <Compile Include="User.cs" />
+    <Compile Include="Queries.cs" />
     <Compile Include="Processors\CommittedJavaFiles.cs" />
     <Compile Include="Processors\CheckUrlsGH.cs" />
     <Compile Include="Processors\CheckUrlsSF.cs" />
-    <Compile Include="Processors\IProcessor.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -8,17 +8,11 @@ using System.IO;
 // ReSharper disable InconsistentNaming
 namespace BOA.Processors
 {
-    public class CheckUrlsSF: IProcessor
+    public class CheckUrlsSF
     {
-        public List<string> Data { get; set; }
         public CheckUrlsSF(List<string> data)
         {
-            Data = data;
-        }
-
-        public void Process()
-        {
-            var urlsList = Data.Select(x => Regex.Match(x, "http.+", RegexOptions.IgnoreCase).ToString()).ToList();
+            var urlsList = data.Select(x => Regex.Match(x, "http.+", RegexOptions.IgnoreCase).ToString()).ToList();
 
             //WebClient client = new WebClient();
 

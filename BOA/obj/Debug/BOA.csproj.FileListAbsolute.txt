@@ -7,3 +7,6 @@ C:\Users\Tolga\Google Drive\BOA\App\BOA test\obj\Debug\BOA.pdb
 C:\Users\Tolga\Google Drive\BOA\App\BOA\bin\Debug\BOA.exe.config
 C:\Users\Tolga\Google Drive\BOA\App\BOA\obj\Debug\BOA.exe
 C:\Users\Tolga\Google Drive\BOA\App\BOA\obj\Debug\BOA.pdb
+C:\Users\Tolga\Documents\GitHub\BOA\BOA\bin\Debug\BOA.exe.config
+C:\Users\Tolga\Documents\GitHub\BOA\BOA\obj\Debug\BOA.exe
+C:\Users\Tolga\Documents\GitHub\BOA\BOA\obj\Debug\BOA.pdb

@@ -6,21 +6,15 @@ using System.Net;
 // ReSharper disable InconsistentNaming
 namespace BOA.Processors
 {
-    public class CheckUrlsGH : IProcessor
+    public class CheckUrlsGH
     {
-        List<string> Data { get; set; }
         readonly List<string> users = new List<string>();
         readonly List<string> names = new List<string>();
         readonly List<string> toRemove = new List<string>();
 
         public CheckUrlsGH(List<string> data)
         {
-            Data = data;
-        }
-
-        public void Process()
-        {
-            foreach (var item in Data)
+            foreach (var item in data)
             {
                 var parted = item.Split(Convert.ToChar("="));
                 var user = parted[1].Trim();
@@ -59,7 +53,7 @@ namespace BOA.Processors
             Console.WriteLine();
             Console.WriteLine("With Username: "+users.Count);
             Console.WriteLine("Without Username: "+names.Count);
-            Console.WriteLine("Total Committers: "+Data.Count);
+            Console.WriteLine("Total Committers: "+data.Count);
 
             File.WriteAllLines("ValidGitHubUsers.txt", users);
             File.AppendAllText("ValidGitHubUsers.txt", "\r\nTotal: " + users.Count);
