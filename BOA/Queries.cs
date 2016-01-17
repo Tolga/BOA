@@ -35,15 +35,55 @@
                     });";
         }
 
-        public static string GetCommitedJavaFiles()
+        public static string FileChangesPerCommit(int top = 10)
+        {
+            return @"
+            p: Project = input;
+            counts: output top(" + top + @") of string weight int;
+            commit_info:= """";
+            changes:= """";
+            added:= 0;
+            modified:= 0;
+            deleted:= 0;
+
+            visit(p, visitor {
+                before node: Revision->commit_info = format(""%s # %s # %s # %s"", p.id, node.id, node.committer.username, node.commit_date);
+                before node: ChangedFile->  {
+                    if (node.change == ChangeKind.ADDED)
+                        added++;
+                    if (node.change == ChangeKind.MODIFIED)
+                        modified++;
+                    if (node.change == ChangeKind.DELETED)
+                        deleted++;
+                }
+                before _ -> {
+                    changes = format(""%s # %s # %s"", added, modified, deleted);
+                    counts << format(""%s | %s"", commit_info, changes) weight 1;
+                    added = 0;
+                    modified = 0;
+                    deleted = 0;
+                }
+            });";
+        }
+
+        public static string Commits(int top = 10)
         {
             return @"p: Project = input;
-                    project: output collection[string] of string;
-                    commit_date: time;
+                        tempString := """";
+                        files: output top(" + top + @") of string weight int;
 
-                    visit(p, visitor {
-                        before node: Revision -> commit_info = format(""%s = %s = %s = %s"", node.id, node.committer.username, node.commit_date);
-                        before node: ChangedFile -> project[p.id] << format(""%s = %s"", commit_info, node.change);
+                        visit(p, visitor {
+	                        before node: Revision -> {
+	                            tempString = format(""%s # %s # %s # %s"",p.id,node.id,node.committer.username, node.commit_date);
+	                        }
+	                        before node: ChangedFile -> {
+			                    if (node.change == ChangeKind.ADDED)
+			                        files << format(""%s # %s"",tempString, ""A"") weight 1;
+			                    if (node.change == ChangeKind.DELETED)
+			                        files << format(""%s # %s"",tempString, ""D"") weight 1;
+			                    if (node.change == ChangeKind.MODIFIED)
+			                        files << format(""%s # %s"",tempString, ""M"") weight 1;
+	                        }
                     });";
         }
     }

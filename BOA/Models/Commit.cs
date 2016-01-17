@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BOA
+namespace BOA.Models
 {
     public class Commit
     {

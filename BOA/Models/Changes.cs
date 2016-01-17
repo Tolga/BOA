@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace BOA
+﻿namespace BOA.Models
 {
     public class Changes
     {

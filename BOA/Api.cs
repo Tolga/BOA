@@ -6,12 +6,12 @@ using boa = edu.iastate.cs.boa;
 
 namespace BOA
 {
-    class Api
+    public class Api
     {
         private readonly string _query;
         private readonly boa.BoaClient _client;
 
-        public Api(string password, string username, string query)
+        public Api(string username, string password, string query)
         {
             _query = query;
             _client = new boa.BoaClient();
@@ -31,7 +31,7 @@ namespace BOA
         public List<string> Execute(int repository = 0)
         {
             var i = 0;
-            var symbol = new[] { "|", "/", "—", "\\" };
+            var symbol = new[] { ".", "..","...", "...." };
             
             var dataSets = _client.getDatasets();
             var data = _client.query(_query, dataSets[repository]);
@@ -45,7 +45,8 @@ namespace BOA
                 Thread.Sleep(1000);
                 data.refresh();
                 compileStatus = data.getCompilerStatus();
-                Console.Write("\rCompilation Status: " + compileStatus + " " + symbol[i++]);
+                Console.Write("\rCompilation Status: " + compileStatus + " " + symbol[i]);
+                i++;
                 if (i == 4) i = 0;
             }
             Console.Write("\rCompleted!");
@@ -60,7 +61,8 @@ namespace BOA
                 Thread.Sleep(1000);
                 data.refresh();
                 execStatus = data.getExecutionStatus();
-                Console.Write("\rRunning Status: " + execStatus + " " + symbol[i++]);
+                Console.Write("\rRunning Status: " + execStatus + " " + symbol[i]);
+                i++;
                 if (i == 4) i = 0;
             }
             Console.Write("\rFinished!");
