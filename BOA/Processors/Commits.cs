@@ -8,31 +8,42 @@ namespace BOA.Processors
 {
     public class Commits
     {
-        public Dictionary<string, User> Users { get; set; }
+        public HashSet<User> Users { get; set; }
 
-        public Commits(IReadOnlyCollection<string> data)
+        public Commits()
         {
-            File.WriteAllLines("Commits.RAWDATA.txt", data);
+            Users = new HashSet<User>();
+        }
+
+        public HashSet<User> Process(IReadOnlyCollection<string> data)
+        {
+            File.WriteAllLines("CommitsRAW.txt", data);
 
             foreach (var item in data)
             {
-                var commitInfo = item.Split(Convert.ToChar("|"));
-                var split = commitInfo[0].Split(Convert.ToChar("#"));
-                var changes = commitInfo[1].Split(Convert.ToChar("#"));
-
-                var commitId = int.Parse(split[1].Trim());
-                var projectId = int.Parse(split[0].Trim());
+                var split = item.Replace("files[] = ", "").Split(Convert.ToChar("#"));
+                var projectId = int.Parse(split.First().Trim());
+                var commitId = split[1].Trim();
                 var userName = split[2].Trim();
                 var date = DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(split[3].Trim().Replace("000000", "")));
+                var change = split.Last().Trim().Split(Convert.ToChar(","));
+                var added = 0;
+                var modified = 0;
+                var deleted = 0;
 
-                var added = int.Parse(changes[0].Trim());
-                var modified = int.Parse(changes[1].Trim());
-                var deleted = int.Parse(changes[2].Trim());
+                switch (change[0])
+                {
+                    case "A": added = int.Parse(change[1].Trim().Replace(".0", "")); break;
+                    case "M": modified = int.Parse(change[1].Trim().Replace(".0", "")); break;
+                    case "D": deleted = int.Parse(change[1].Trim().Replace(".0", "")); break;
+                }
 
                 var user = new User();
 
-                if (Users.ContainsKey(userName))
-                    user = Users.Single(u => u.Key.Equals(userName)).Value;
+                if (Users.Any(u => u.UserName == userName))
+                {
+                    user = Users.Single(u => u.UserName == userName);
+                }
                 else
                 {
                     user.UserName = userName;
@@ -45,7 +56,10 @@ namespace BOA.Processors
 
                 var commit = new Commit();
 
-                var committed = user.Commits.Exists(c => c.CommitId.Equals(commitId));
+                if (commit.Changes == null)
+                    commit.Changes = new Changes();
+
+                var committed = user.Commits.Any(c => c.CommitId == commitId);
                 if (committed)
                     commit = user.Commits.Single(c => c.CommitId.Equals(commitId));
                 
@@ -54,15 +68,18 @@ namespace BOA.Processors
                 commit.Changes.Deleted += deleted;
 
                 // if current commitId doesn't exists in User's context fill commit
-                if (!committed) continue;
+                if (!committed)
+                {
                     commit.CommitId = commitId;
                     commit.ProjectId = projectId;
                     commit.Date = date;
                     user.Commits.Add(commit);
+                }
+
+                Users.Add(user);
             }
-            
-            Console.Clear();
-            Console.ReadLine();
+
+            return Users;
         }
     }
 }

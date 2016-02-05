@@ -3,7 +3,6 @@ using BOA.Models;
 
 namespace BOA.Serializers
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
 

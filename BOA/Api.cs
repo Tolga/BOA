@@ -31,7 +31,7 @@ namespace BOA
         public List<string> Execute(int repository = 0)
         {
             var i = 0;
-            var symbol = new[] { ".", "..","...", "...." };
+            var symbol = new[] { ".  ", ".. ", "..." };
             
             var dataSets = _client.getDatasets();
             var data = _client.query(_query, dataSets[repository]);
@@ -45,11 +45,10 @@ namespace BOA
                 Thread.Sleep(1000);
                 data.refresh();
                 compileStatus = data.getCompilerStatus();
-                Console.Write("\rCompilation Status: " + compileStatus + " " + symbol[i]);
+                Console.Write("\rCompilation Status: " + compileStatus + symbol[i]);
                 i++;
-                if (i == 4) i = 0;
+                if (i == 3) i = 0;
             }
-            Console.Write("\rCompleted!");
             Console.WriteLine("");
 
 
@@ -61,12 +60,10 @@ namespace BOA
                 Thread.Sleep(1000);
                 data.refresh();
                 execStatus = data.getExecutionStatus();
-                Console.Write("\rRunning Status: " + execStatus + " " + symbol[i]);
+                Console.Write("\rRunning Status: " + execStatus + symbol[i]);
                 i++;
-                if (i == 4) i = 0;
+                if (i == 3) i = 0;
             }
-            Console.Write("\rFinished!");
-
 
             try
             {

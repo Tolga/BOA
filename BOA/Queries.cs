@@ -66,7 +66,7 @@
             });";
         }
 
-        public static string Commits(int top = 10)
+        public static string Commits(int top = 5000000)
         {
             return @"p: Project = input;
                         tempString := """";
@@ -74,15 +74,15 @@
 
                         visit(p, visitor {
 	                        before node: Revision -> {
-	                            tempString = format(""%s # %s # %s # %s"",p.id,node.id,node.committer.username, node.commit_date);
+	                            tempString = format(""%s # %s # %s # %s"", p.id, node.id, node.author.username, node.commit_date);
 	                        }
 	                        before node: ChangedFile -> {
 			                    if (node.change == ChangeKind.ADDED)
-			                        files << format(""%s # %s"",tempString, ""A"") weight 1;
+			                        files << format(""%s # %s"", tempString, ""A"") weight 1;
 			                    if (node.change == ChangeKind.DELETED)
-			                        files << format(""%s # %s"",tempString, ""D"") weight 1;
+			                        files << format(""%s # %s"", tempString, ""D"") weight 1;
 			                    if (node.change == ChangeKind.MODIFIED)
-			                        files << format(""%s # %s"",tempString, ""M"") weight 1;
+			                        files << format(""%s # %s"", tempString, ""M"") weight 1;
 	                        }
                     });";
         }

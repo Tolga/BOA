@@ -1,44 +1,56 @@
 ﻿namespace BOA
 {
-    using System;
+    using System.IO;
+    using System.Linq;
     using System.Collections.Generic;
+    using Models;
     using Processors;
     using Serializers;
 
     internal class Program
     {
-        private static List<string> FileChangesPerCommit => new Api("tolgamengu", "Boa352", Queries.Commits(100000)).Execute();
+        private static List<string> ReadUsersDataFile => File.ReadAllLines("CommitsRAW.txt").ToList();
+        public static List<string> FileChangesPerCommit => new Api("tolgamengu", "Boa352", Queries.Commits()).Execute();
 
         private static void Main()
         {
-            var data = new Commits(FileChangesPerCommit);
+            var users = new Commits().Process(ReadUsersDataFile);
 
-            var users = data.Users;
-
-            Json json = new Json();
+            //var json = new Json();
+            var csv = new Csv();
 
             foreach (var user in users)
             {
-                var userName = user.Value.UserName;
-
-                Console.WriteLine("User: " + userName + " Total Projects: " + user.Value.Projects.Count + " Total Commits: " + user.Value.Commits.Count);
-                Console.WriteLine();
-
-                json.AddUser(userName);
-
-                foreach (var project in user.Value.Projects)
+                //json.AddUser(user.Value.UserName);
+                foreach (var project in user.Projects)
                 {
-                    json.AddProject(project, user.Value.Commits.FindAll(c => c.ProjectId.Equals(project)));
+                    foreach (var commit in user.Commits)
+                    {
+                        var newChanges = new Changes
+                        {
+                            Added = commit.Changes.Added,
+                            Modified = commit.Changes.Modified,
+                            Deleted = commit.Changes.Deleted
+                        };
+
+                        var newCommit = new Commit
+                        {
+                            CommitId = commit.CommitId,
+                            ProjectId = project,
+                            Date = commit.Date,
+                            Changes = newChanges
+                        };
+
+                        csv.Add(user.UserName, newCommit);
+                    }
+                    //json.AddProject(project, user.Value.Commits.FindAll(c => c.ProjectId.Equals(project)));
                 }
-
-                json.CloseUser();
+                //json.CloseUser();
             }
-
-            json.CloseFile();
-            json.Save();
+            csv.Save();
+            //json.CloseFile();
+            //json.Save();
         }
-
-        //private static List<string> ReadUsersDataFile => File.ReadAllLines("Commits.txt").ToList();
 
         /*
         foreach (var commit in commits)
