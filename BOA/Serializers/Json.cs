@@ -8,7 +8,7 @@ namespace BOA.Serializers
 
     public class Json
     {
-        private List<string> Data { get; set; }
+        private List<string> Data { get; }
 
         public Json()
         {
@@ -23,7 +23,7 @@ namespace BOA.Serializers
             Data.Add("\"Projects\" : [");
         }
 
-        public void AddProject(int projectId, List<Commit> commits)
+        public void Add(int projectId, List<Commit> commits)
         {
             Data.Add("{\"ProjectId\" : \"" + projectId + "\",");
             Data.Add("\"Commits\" : [");

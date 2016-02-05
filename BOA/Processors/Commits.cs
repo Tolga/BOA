@@ -25,7 +25,7 @@ namespace BOA.Processors
                 var projectId = int.Parse(split.First().Trim());
                 var commitId = split[1].Trim();
                 var userName = split[2].Trim();
-                var date = DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(split[3].Trim().Replace("000000", "")));
+                var date = long.Parse(split[3].Trim().Replace("000000", ""));
                 var change = split.Last().Trim().Split(Convert.ToChar(","));
                 var added = 0;
                 var modified = 0;
