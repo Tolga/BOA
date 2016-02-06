@@ -35,7 +35,7 @@ namespace BOA
             
             var dataSets = _client.getDatasets();
             var data = _client.query(_query, dataSets[repository]);
-            Console.Write("query Submitted!");
+            Console.Write("Query submitted!");
 
 
             data.refresh();
@@ -49,8 +49,7 @@ namespace BOA
                 i++;
                 if (i == 3) i = 0;
             }
-            Console.WriteLine("");
-
+            Console.WriteLine();
 
             i = 0;
             data.refresh();
@@ -64,6 +63,7 @@ namespace BOA
                 i++;
                 if (i == 3) i = 0;
             }
+            Console.WriteLine();
 
             try
             {

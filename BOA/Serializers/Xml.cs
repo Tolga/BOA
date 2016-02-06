@@ -47,6 +47,7 @@ namespace BOA.Serializers
 
         public void CloseUser()
         {
+            Data.Add("</Projects>");
             Data.Add("</User>");
         }
 

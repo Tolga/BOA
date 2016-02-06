@@ -20,7 +20,7 @@
 	                    counts << p.developers[i].username weight 1;";
         }
 
-        public static string GetCommitersList()
+        public static string GetAuthorsList()
         {
             return @"p: Project = input;
                     project: output collection[string] of string;
@@ -28,9 +28,9 @@
 
                     visit(p, visitor {
 	                    before node: Revision ->
-		                    if (!haskey(committers, node.committer.username)) {
-			                    committers[node.committer.username] = true;
-                                project[p.id] << node.committer.username;
+		                    if (!haskey(committers, node.author.username)) {
+			                    committers[node.author.username] = true;
+                                project[p.id] << node.author.username;
 		                    }
                     });";
         }

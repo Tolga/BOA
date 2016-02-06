@@ -1,44 +1,51 @@
-﻿namespace BOA
+﻿using BOA.Models;
+
+namespace BOA
 {
-    using System.IO;
-    using System.Linq;
     using System.Collections.Generic;
     using Processors;
     using Serializers;
 
     internal class Program
     {
-        private static List<string> ReadUsersDataFile => File.ReadAllLines("CommitsRAW.txt").ToList();
-        public static List<string> FileChangesPerCommit => new Api("tolgamengu", "Boa352", Queries.Commits()).Execute();
+        //private static List<string> ReadUsersDataFile => File.ReadAllLines("CommitsRAW.txt").ToList();
+        //private static List<string> GetCommitersList => new Api("tolgamengu", "Boa352", Queries.GetAuthorsList()).Execute(1);
+        private static List<string> FileChangesPerCommit => new Api("tolgamengu", "Boa352", Queries.Commits()).Execute(1);
 
         private static void Main()
         {
-            var users = new Commits().Process(ReadUsersDataFile);
+            var commits = new Commits();
+            commits.Process(FileChangesPerCommit);
+            SaveCommits(commits.ValidCommits(), "ValidCommits");
+            SaveCommits(commits.InvalidCommits(), "InvalidCommits");
+        }
 
+        private static void SaveCommits(HashSet<User> commits, string fileName = "Commits")
+        {
             var xml = new Xml();
             var json = new Json();
             var csv = new Csv();
 
-            foreach (var user in users)
+            foreach (var user in commits)
             {
                 xml.AddUser(user.UserName);
                 json.AddUser(user.UserName);
                 foreach (var project in user.Projects)
                 {
-                    var commits = user.Commits.FindAll(c => c.ProjectId.Equals(project));
-                    csv.Add(user.UserName, commits);
-                    xml.Add(project, commits);
-                    json.Add(project, commits);
+                    var commitsByUser = user.Commits.FindAll(c => c.ProjectId == project);
+                    csv.Add(user.UserName, commitsByUser);
+                    xml.Add(project, commitsByUser);
+                    json.Add(project, commitsByUser);
                 }
                 xml.CloseUser();
                 json.CloseUser();
             }
 
-            csv.Save();
+            csv.Save(fileName);
             xml.CloseFile();
-            xml.Save();
+            xml.Save(fileName);
             json.CloseFile();
-            json.Save();
+            json.Save(fileName);
         }
     }
 }

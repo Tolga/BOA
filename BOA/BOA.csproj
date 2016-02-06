@@ -60,7 +60,7 @@
     <Compile Include="Models\User.cs" />
     <Compile Include="Queries.cs" />
     <Compile Include="Processors\Commits.cs" />
-    <Compile Include="Processors\CheckUrlsGH.cs" />
+    <Compile Include="Processors\CheckAuthors.cs" />
     <Compile Include="Processors\CheckUrlsSF.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -8,20 +8,34 @@ namespace BOA.Processors
 {
     public class Commits
     {
-        public HashSet<User> Users { get; set; }
+        private HashSet<User> ValidCommitsByUsers { get; }
+        private HashSet<User> InvalidCommitsByUsers { get; }
 
         public Commits()
         {
-            Users = new HashSet<User>();
+            ValidCommitsByUsers = new HashSet<User>();
+            InvalidCommitsByUsers = new HashSet<User>();
         }
 
-        public HashSet<User> Process(IReadOnlyCollection<string> data)
+        public HashSet<User> ValidCommits()
         {
-            File.WriteAllLines("CommitsRAW.txt", data);
+            return ValidCommitsByUsers;
+        }
+
+        public HashSet<User> InvalidCommits()
+        {
+            return InvalidCommitsByUsers;
+        }
+
+        public void Process(IReadOnlyCollection<string> data)
+        {
+            File.WriteAllLines("CommitsMediumRAW.txt", data);
+            var validAuthors = File.ReadAllLines("ValidAuthors.txt").ToList();
 
             foreach (var item in data)
             {
                 var split = item.Replace("files[] = ", "").Split(Convert.ToChar("#"));
+
                 var projectId = int.Parse(split.First().Trim());
                 var commitId = split[1].Trim();
                 var userName = split[2].Trim();
@@ -33,16 +47,22 @@ namespace BOA.Processors
 
                 switch (change[0])
                 {
-                    case "A": added = int.Parse(change[1].Trim().Replace(".0", "")); break;
-                    case "M": modified = int.Parse(change[1].Trim().Replace(".0", "")); break;
-                    case "D": deleted = int.Parse(change[1].Trim().Replace(".0", "")); break;
+                    case "A":
+                        added = int.Parse(change[1].Trim().Replace(".0", ""));
+                        break;
+                    case "M":
+                        modified = int.Parse(change[1].Trim().Replace(".0", ""));
+                        break;
+                    case "D":
+                        deleted = int.Parse(change[1].Trim().Replace(".0", ""));
+                        break;
                 }
 
                 var user = new User();
 
-                if (Users.Any(u => u.UserName == userName))
+                if (ValidCommitsByUsers.Any(u => u.UserName == userName))
                 {
-                    user = Users.Single(u => u.UserName == userName);
+                    user = ValidCommitsByUsers.Single(u => u.UserName == userName);
                 }
                 else
                 {
@@ -62,12 +82,11 @@ namespace BOA.Processors
                 var committed = user.Commits.Any(c => c.CommitId == commitId);
                 if (committed)
                     commit = user.Commits.Single(c => c.CommitId.Equals(commitId));
-                
+
                 commit.Changes.Added += added;
                 commit.Changes.Modified += modified;
                 commit.Changes.Deleted += deleted;
 
-                // if current commitId doesn't exists in User's context fill commit
                 if (!committed)
                 {
                     commit.CommitId = commitId;
@@ -76,10 +95,15 @@ namespace BOA.Processors
                     user.Commits.Add(commit);
                 }
 
-                Users.Add(user);
+                if (validAuthors.Contains(userName))
+                {
+                    ValidCommitsByUsers.Add(user);
+                }
+                else
+                {
+                    InvalidCommitsByUsers.Add(user);
+                }
             }
-
-            return Users;
         }
     }
 }
